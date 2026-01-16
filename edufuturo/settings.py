@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     'learning',
     'gamification',
     'analytics',
+    'academic',
+    'assessments',
 ]
 
 MIDDLEWARE = [
