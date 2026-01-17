@@ -10,3 +10,4 @@ Pillow>=10.2
 django-filter>=23.5
 drf-yasg>=1.21
 xhtml2pdf>=0.2.15
+mercadopago>=0.2.15

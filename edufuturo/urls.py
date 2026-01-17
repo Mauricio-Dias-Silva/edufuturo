@@ -19,6 +19,8 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('users.urls')), # Auth Routes (Login, Register, Root)
+    path('courses/', include('courses.urls')),
+    path('subscriptions/', include('subscriptions.urls')),
     path('api-auth/', include('rest_framework.urls')),
     
     # Swagger

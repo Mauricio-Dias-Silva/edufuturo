@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Painel - EduFuturo{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar Info -->
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm border-0 text-center py-4">
+                <div class="card-body">
+                    <img src="https://ui-avatars.com/api/?name={{ user.username }}&size=128"
+                        class="rounded-circle mb-3 shadow">
+                    <h5 class="card-title fw-bold">{{ user.first_name|default:user.username }}</h5>
+                    <p class="text-muted small">{{ user.email }}</p>
+                    <span class="badge bg-success">Estudante Ativo</span>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <div class="row text-center">
+                        <div class="col">
+                            <strong>{{ enrollments.count }}</strong>
+                            <small class="d-block text-muted">Cursos</small>
+                        </div>
+                        <div class="col">
+                            <strong>{{ certificates.count|default:"0" }}</strong>
+                            <small class="d-block text-muted">Certificados</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <h3 class="mb-4">Meus Cursos</h3>
+
+            {% if enrollments %}
+            <div class="row">
+                {% for enrollment in enrollments %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                            <div class="progress mt-3 mb-2" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 45%;"
+                                    aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <small class="text-muted">Progresso: 45% (Simulado)</small>
+                        </div>
+                        <div
+                            class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
+                            <a href="{% url 'courses:detail' enrollment.course.slug %}"
+                                class="btn btn-outline-primary btn-sm">Continuar Estudando</a>
+                            {% if enrollment.completed %}
+                            <span class="badge bg-warning text-dark"><i class="bi bi-trophy-fill"></i> Concluído</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info d-flex align-items-center" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <div>
+                    Você ainda não está matriculado em nenhum curso.
+                    <a href="/courses/" class="fw-bold text-decoration-none">Ver cursos disponíveis</a>
+                </div>
+            </div>
+            {% endif %}
+
+            <h3 class="mt-5 mb-4">Minhas Conquistas (Gamification)</h3>
+            <div class="row g-3">
+                <div class="col-md-3 col-6 text-center">
+                    <div class="p-3 border rounded bg-light">
+                        <i class="bi bi-star-fill text-warning display-5"></i>
+                        <p class="mt-2 mb-0 fw-bold">Iniciante</p>
+                        <small class="text-muted">100 Pontos</small>
+                    </div>
+                </div>
+                <!-- Mock Badges -->
+                <div class="col-md-3 col-6 text-center opacity-50">
+                    <div class="p-3 border rounded">
+                        <i class="bi bi-lightning-fill text-secondary display-5"></i>
+                        <p class="mt-2 mb-0 fw-bold">Rápido</p>
+                        <small class="text-muted">Bloqueado</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

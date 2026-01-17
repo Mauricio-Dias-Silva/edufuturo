@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Planos e Preços - EduFuturo{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Planos de Assinatura</h1>
+        <p class="lead text-muted">Escolha o melhor plano para sua jornada de aprendizado</p>
+    </div>
+
+    <div class="row justify-content-center">
+        {% for plan in plans %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow border-0 {% if plan.name == 'Pro' %}border-primary ring-2{% endif %}">
+                {% if plan.name == 'Pro' %}
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <span class="fw-bold">Mais Popular</span>
+                </div>
+                {% endif %}
+                <div class="card-body p-5 text-center">
+                    <h3 class="fw-bold">{{ plan.name }}</h3>
+                    <div class="display-4 fw-bold my-4">R$ {{ plan.price }}</div>
+                    <p class="text-muted">{{ plan.description }}</p>
+                    <div class="d-grid mt-4">
+                        <a href="{% url 'subscriptions:subscribe' plan.slug %}"
+                            class="btn btn-lg {% if plan.name == 'Pro' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            Assinar Agora
+                        </a>
+                    </div>
+                    <ul class="list-unstyled mt-4 text-start">
+                        <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i> Acesso a todos os cursos</li>
+                        <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i> Certificados Incluídos</li>
+                        <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i> Suporte Prioritário</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

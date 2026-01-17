@@ -4,57 +4,75 @@ from users.models import User
 from courses.models import Course, Module, Content, Quiz, Question, Choice
 from academic.models import AcademicTerm, Discipline, ClassSession
 import datetime
+import random
 
 class Command(BaseCommand):
-    help = 'Populate database with demo data'
+    help = 'Populate database with MASSIVE demo data'
 
     def handle(self, *args, **kwargs):
-        self.stdout.write('Creating Demo Data...')
+        self.stdout.write('Creating Heavy Demo Data...')
 
-        # 1. Create Superuser & Instructors
+        # 1. Create Superuser (if not exists)
         if not User.objects.filter(username='admin').exists():
             User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-            self.stdout.write('Admin created (admin/admin123)')
 
-        inst, _ = User.objects.get_or_create(username='prof.silva', defaults={'email': 'silva@edufuturo.com', 'is_instructor': True})
-        inst.set_password('123456')
-        inst.save()
-
-        student, _ = User.objects.get_or_create(username='aluno.teste', defaults={'email': 'aluno@edufuturo.com', 'is_student': True})
-        student.set_password('123456')
-        student.save()
-
-        # 2. Academic Data
-        term, _ = AcademicTerm.objects.get_or_create(
-            name='2026.1', 
-            defaults={'start_date': datetime.date(2026, 2, 1), 'end_date': datetime.date(2026, 6, 30), 'is_active': True}
-        )
-
-        disc_math, _ = Discipline.objects.get_or_create(code='MAT101', defaults={'name': 'Cálculo I', 'credits': 4})
-        disc_prog, _ = Discipline.objects.get_or_create(code='PROG101', defaults={'name': 'Algoritmos e Programação', 'credits': 4})
-
-        ClassSession.objects.get_or_create(discipline=disc_math, term=term, instructor=inst)
-        ClassSession.objects.get_or_create(discipline=disc_prog, term=term, instructor=inst)
-
-        # 3. Create a Demo Course (LMS Style)
-        course, _ = Course.objects.get_or_create(
-            slug='python-fullstack',
-            defaults={
-                'title': 'Python Fullstack Masterclass',
-                'instructor': inst,
-                'overview': 'Aprenda Django, DRF e React do zero ao deploy.'
-            }
-        )
-
-        # Module 1
-        mod1, _ = Module.objects.get_or_create(course=course, title='Introdução ao Python', order=1)
-        Content.objects.get_or_create(module=mod1, title='Instalando o Python', order=1, defaults={'video_url': 'https://www.youtube.com/watch?v=rfscVS0vtbw'})
-        Content.objects.get_or_create(module=mod1, title='Variáveis e Tipos', order=2, defaults={'text': 'Em Python, a tipagem é dinâmica...'})
-
-        # Quiz
-        quiz, _ = Quiz.objects.get_or_create(module=mod1, title='Quiz de Fixação')
-        q1, _ = Question.objects.get_or_create(quiz=quiz, text='Qual a extensão de arquivos Python?')
-        Choice.objects.get_or_create(question=q1, text='.py', is_correct=True)
-        Choice.objects.get_or_create(question=q1, text='.java', is_correct=False)
+        # 2. Create 5 Instructors
+        instructors = []
+        for i in range(1, 6):
+            inst, _ = User.objects.get_or_create(username=f'prof.demo{i}', defaults={
+                'email': f'prof{i}@edufuturo.com', 
+                'first_name': f'Professor {i}',
+                'last_name': 'Silva',
+                'is_instructor': True
+            })
+            inst.set_password('123456')
+            inst.save()
+            instructors.append(inst)
         
-        self.stdout.write(self.style.SUCCESS('Successfully populated database!'))
+        # 3. Create 10 Students
+        students = []
+        for i in range(1, 11):
+            stu, _ = User.objects.get_or_create(username=f'aluno.demo{i}', defaults={
+                'email': f'aluno{i}@edufuturo.com',
+                'first_name': f'Aluno {i}',
+                'last_name': 'Santos',
+                'is_student': True
+            })
+            stu.set_password('123456')
+            stu.save()
+            students.append(stu)
+
+        # 4. Create 10 Courses (Diverse Topics)
+        topics = [
+            ('Python para Data Science', 'Domine pandas, numpy e matplotlib.'),
+            ('Marketing Digital Avançado', 'Estratégias de SEO e Tráfego Pago.'),
+            ('Gastronomia Molecular', 'A ciência por trás da culinária moderna.'),
+            ('Finanças Pessoais', 'Como investir e sair das dívidas.'),
+            ('Inglês para Negócios', 'Vocabulário corporativo essencial.'),
+            ('Desenvolvimento Mobile com Flutter', 'Crie apps para iOS e Android.'),
+            ('Liderança Ágil', 'Gestão de times com Scrum e Kanban.'),
+            ('Fotografia Profissional', 'Domine a luz e a composição.'),
+            ('Direito Constitucional', 'Preparatório para concursos.'),
+            ('História da Arte', 'Do Renascimento ao Modernismo.')
+        ]
+
+        for i, (title, overview) in enumerate(topics):
+            course, _ = Course.objects.get_or_create(
+                slug=f'curso-{i}',
+                defaults={
+                    'title': title,
+                    'instructor': random.choice(instructors),
+                    'overview': overview
+                }
+            )
+            
+            # Create 3 Modules per course
+            for m in range(1, 4):
+                mod, _ = Module.objects.get_or_create(course=course, title=f'Módulo {m}: Fundamentos', order=m)
+                
+                # Create Content
+                # Using 'Big Buck Bunny' (Open Content) to ensure it plays embedded
+                Content.objects.get_or_create(module=mod, title=f'Aula {m}.1 - Introdução', order=1, defaults={'video_url': 'https://www.youtube.com/watch?v=aqz-KE-bpKQ'})
+                Content.objects.get_or_create(module=mod, title=f'Aula {m}.2 - Prática', order=2, defaults={'text': 'Conteúdo de leitura...'})
+
+        self.stdout.write(self.style.SUCCESS(f'Successfully created {len(instructors)} instructors, {len(students)} students and 10 courses!'))

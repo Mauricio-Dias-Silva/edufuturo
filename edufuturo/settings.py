@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'analytics',
     'academic',
     'assessments',
+    'subscriptions',
 ]
 
 MIDDLEWARE = [
@@ -115,3 +116,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ],
 }
+
+# Auth Redirects
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'index'

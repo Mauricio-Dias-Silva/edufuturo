@@ -37,8 +37,9 @@ class Content(models.Model):
     module = models.ForeignKey(Module, related_name='contents', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     file = models.FileField(upload_to='courses/content_files/', blank=True, null=True)
+    video_url = models.URLField(blank=True, null=True, help_text="YouTube URL")
+    is_live = models.BooleanField(default=False, help_text="Is this a live stream?")
     text = models.TextField(blank=True, null=True)
-    video_url = models.URLField(blank=True, null=True)
     order = models.PositiveIntegerField(default=0)
     
     class Meta:

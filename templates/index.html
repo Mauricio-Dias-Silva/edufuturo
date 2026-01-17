@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-dark text-white py-5 text-center"
+    style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'); background-size: cover; background-position: center;">
+    <div class="container py-5">
+        <h1 class="display-3 fw-bold">O Futuro da Educação é Agora</h1>
+        <p class="lead mb-4">Plataforma universitária completa com gamificação, certificados e tutoria inteligente.</p>
+        {% if not user.is_authenticated %}
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-5 me-2">Começar Agora</a>
+        <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-5">Já tenho conta</a>
+        {% else %}
+        <a href="/courses/" class="btn btn-success btn-lg px-5">Ir para Meus Cursos</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container py-5">
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 p-4 border-0 shadow-sm">
+                <i class="bi bi-trophy-fill text-warning display-4 mb-3"></i>
+                <h3>Gamificação</h3>
+                <p class="text-muted">Ganhe pontos, suba no ranking e conquiste emblemas exclusivos enquanto aprende.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 p-4 border-0 shadow-sm">
+                <i class="bi bi-file-earmark-pdf-fill text-danger display-4 mb-3"></i>
+                <h3>Certificados Válidos</h3>
+                <p class="text-muted">Emissão automática de certificados com código de validação QR Code único.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 p-4 border-0 shadow-sm">
+                <i class="bi bi-camera-video-fill text-primary display-4 mb-3"></i>
+                <h3>Aulas Interativas</h3>
+                <p class="text-muted">Integração com YouTube, suporte a turmas acadêmicas e provas temporizadas.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Courses Preview -->
+<div class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Cursos em Destaque</h2>
+        <div class="row">
+            {% for course in courses %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text text-muted">{{ course.overview|truncatewords:20 }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <a href="#" class="btn btn-outline-primary w-100">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">Nenhum curso público disponível no momento. Faça login para ver sua grade
+                    acadêmica.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
