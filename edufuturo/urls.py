@@ -21,6 +21,7 @@ urlpatterns = [
     path('', include('users.urls')), # Auth Routes (Login, Register, Root)
     path('courses/', include('courses.urls')),
     path('subscriptions/', include('subscriptions.urls')),
+    path('assessments/', include('assessments.urls')), # New Assessments Module
     path('api-auth/', include('rest_framework.urls')),
     
     # Swagger

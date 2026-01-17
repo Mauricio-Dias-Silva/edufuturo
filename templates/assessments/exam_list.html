@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Minhas Avaliações</h2>
+    <p class="text-muted">Provas das turmas em que você está matriculado.</p>
+
+    <div class="table-responsive mt-3">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Prova</th>
+                    <th>Turma</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th>Nota</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in exam_attempts %}
+                <tr>
+                    <td>{{ item.exam.title }}</td>
+                    <td>{{ item.exam.class_session }}</td>
+                    <td>{{ item.exam.scheduled_at|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% if item.status == 'SUBMITTED' %}
+                        <span class="badge bg-success">Entregue</span>
+                        {% elif item.status == 'FUTURE' %}
+                        <span class="badge bg-warning text-dark">Agendada</span>
+                        {% else %}
+                        <span class="badge bg-primary">Aberta</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.score is not None %}
+                        <strong>{{ item.score }}</strong>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.status == 'OPEN' %}
+                        <a href="{% url 'assessments:take_exam' item.exam.id %}" class="btn btn-primary btn-sm">
+                            Realizar Prova
+                        </a>
+                        {% elif item.status == 'SUBMITTED' %}
+                        <button class="btn btn-secondary btn-sm" disabled>Ver Gabarito</button>
+                        {% else %}
+                        <button class="btn btn-secondary btn-sm" disabled>Aguarde</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">Nenhuma prova agendada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

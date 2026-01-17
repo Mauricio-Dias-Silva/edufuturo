@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{{ exam.title }}</h3>
+                    <small>Turma: {{ exam.class_session }} | Duração: {{ exam.duration_minutes }} min</small>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-clock"></i> Boa sorte! Não feche esta janela sem enviar.
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        {% for item in questions %}
+                        <div class="mb-4 p-3 border rounded shadow-sm">
+                            <h5 class="fw-bold">Questão {{ forloop.counter }} <span
+                                    class="badge bg-secondary float-end">{{ item.points }} pts</span></h5>
+                            <p class="mb-3">{{ item.question.text|linebreaksbr }}</p>
+
+                            {% if item.question.question_type == 'MULTIPLE_CHOICE' or item.question.question_type ==
+                            'TRUE_FALSE' %}
+                            <div class="list-group">
+                                {% for option in item.question.options.all %}
+                                <label class="list-group-item">
+                                    <input class="form-check-input me-1" type="radio"
+                                        name="question_{{ item.question.id }}" value="{{ option.id }}" required>
+                                    {{ option.text }}
+                                </label>
+                                {% endfor %}
+                            </div>
+
+                            {% elif item.question.question_type == 'ESSAY' %}
+                            <textarea name="question_{{ item.question.id }}_text" class="form-control" rows="5"
+                                placeholder="Digite sua resposta..." required></textarea>
+
+                            {% elif item.question.question_type == 'FILL_THE_BLANK' %}
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Complete a lacuna com a resposta correta:</label>
+                                <input type="text" name="question_{{ item.question.id }}_text" class="form-control"
+                                    placeholder="Sua resposta aqui..." required autocomplete="off">
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg"
+                                onclick="return confirm('Tem certeza que deseja enviar a prova?');">
+                                <i class="fas fa-paper-plane"></i> Enviar Prova
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -69,6 +69,37 @@
             </div>
             {% endif %}
 
+            <!-- Upcoming Exams Widget -->
+            <div class="card mb-4 mt-4 shadow-sm border-primary" style="border-left: 5px solid #0d6efd;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0 text-primary"><i class="fas fa-calendar-alt"></i> Próximas Avaliações</h4>
+                        <a href="{% url 'assessments:exam_list' %}" class="btn btn-sm btn-outline-primary">Ver todas</a>
+                    </div>
+
+                    {% if upcoming_exams %}
+                    <div class="list-group list-group-flush">
+                        {% for exam in upcoming_exams %}
+                        <a href="{% url 'assessments:take_exam' exam.id %}"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1 fw-bold">{{ exam.title }}</h6>
+                                <small class="text-muted">{{ exam.class_session }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="d-block badge bg-warning text-dark mb-1">{{ exam.scheduled_at|date:"d/m
+                                    H:i" }}</span>
+                                <small class="text-muted">{{ exam.duration_minutes }} min</small>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">Nenhuma prova agendada para os próximos dias.</p>
+                    {% endif %}
+                </div>
+            </div>
+
             <h3 class="mt-5 mb-4">Minhas Conquistas (Gamification)</h3>
             <div class="row g-3">
                 <div class="col-md-3 col-6 text-center">

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">Resultado: {{ submission.exam.title }}</h3>
+            <p class="mb-0">Nota Preliminar: <strong>{{ submission.grade }}</strong></p>
+        </div>
+        <div class="card-body">
+            <h5 class="mb-4">Gabarito e Feedback</h5>
+
+            {% for item in answers %}
+            <div
+                class="mb-3 p-3 border rounded {% if item.is_correct %}border-success bg-opacity-10 bg-success{% elif item.is_correct == False %}border-danger bg-opacity-10 bg-danger{% else %}border-warning{% endif %}">
+                <p class="fw-bold mb-2">
+                    Questão {{ forloop.counter }}
+                    <span
+                        class="float-end badge {% if item.is_correct %}bg-success{% elif item.is_correct == False %}bg-danger{% else %}bg-secondary{% endif %}">
+                        {% if item.is_correct %}Correta (+{{ item.points_awarded }}){% elif item.is_correct == False
+                        %}Incorreta{% else %}Aguardando Correção{% endif %}
+                    </span>
+                </p>
+                <p>{{ item.question.text }}</p>
+
+                <hr>
+
+                <p class="mb-1 text-muted small">Sua Resposta:</p>
+                {% if item.selected_option %}
+                <p class="fw-bold">{{ item.selected_option.text }}</p>
+                {% else %}
+                <p class="fw-bold">{{ item.text_answer }}</p>
+                {% endif %}
+
+            </div>
+            {% endfor %}
+
+            <div class="mt-4">
+                <a href="{% url 'assessments:exam_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar para Provas
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

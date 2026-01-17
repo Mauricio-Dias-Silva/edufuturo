@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Resumo do Aluno</h5>
+                    <p class="mb-1"><strong>Aluno:</strong> {{ submission.student.get_full_name }}</p>
+                    <p class="mb-1"><strong>Entrega:</strong> {{ submission.submitted_at|date:"d/m/Y H:i" }}</p>
+                    <hr>
+                    <h2 class="text-center text-primary fw-bold">{{ submission.grade|default:"0.0" }}</h2>
+                    <p class="text-center text-muted">Nota Total</p>
+                </div>
+            </div>
+
+            <a href="{% url 'assessments:exam_results' submission.exam.id %}" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-arrow-left"></i> Voltar para Lista
+            </a>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Correção Manual</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        {% for item in answers %}
+                        <div
+                            class="mb-4 p-3 border rounded {% if item.question.question_type == 'ESSAY' %}border-warning bg-opacity-10 bg-warning{% endif %}">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="fw-bold">Questão {{ forloop.counter }} ({{
+                                    item.question.get_question_type_display }})</h6>
+                                <span class="badge bg-secondary">Max: {{ item.question.examquestion_set.first.points }}
+                                    pts</span>
+                            </div>
+
+                            <p class="mt-2">{{ item.question.text }}</p>
+
+                            <div class="p-3 bg-light rounded mt-2">
+                                <small class="text-muted">Resposta do Aluno:</small>
+                                {% if item.selected_option %}
+                                <p
+                                    class="fw-bold mb-0 {% if item.is_correct %}text-success{% else %}text-danger{% endif %}">
+                                    {{ item.selected_option.text }}
+                                </p>
+                                {% else %}
+                                <p class="fw-bold mb-0" style="white-space: pre-wrap;">{{ item.text_answer }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="mt-3 row align-items-center">
+                                <div class="col-auto">
+                                    <label class="col-form-label">Pontos:</label>
+                                </div>
+                                <div class="col-auto">
+                                    <input type="number" step="0.1" name="points_{{ item.id }}" class="form-control"
+                                        style="width: 100px;" value="{{ item.points_awarded }}">
+                                </div>
+                                <div class="col">
+                                    {% if item.is_correct is True %}
+                                    <span class="text-success"><i class="fas fa-check"></i> Correto</span>
+                                    {% elif item.is_correct is False %}
+                                    <span class="text-danger"><i class="fas fa-times"></i> Incorreto</span>
+                                    {% else %}
+                                    <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Requer
+                                        Atenção</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <hr>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Feedback Final do Professor:</label>
+                            <textarea name="final_feedback" class="form-control"
+                                rows="3">{{ submission.feedback }}</textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save"></i> Salvar Notas e Feedback
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

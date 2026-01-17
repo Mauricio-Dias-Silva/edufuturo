@@ -40,4 +40,20 @@ def dashboard(request):
     if hasattr(request.user, 'enrollments'):
         enrollments = request.user.enrollments.select_related('course').all()
     
-    return render(request, 'dashboard.html', {'enrollments': enrollments})
+    # Upcoming Exams Logic
+    from assessments.models import Exam
+    from django.utils import timezone
+    
+    upcoming_exams = []
+    if hasattr(request.user, 'enrolled_classes'):
+        user_classes = request.user.enrolled_classes.all()
+        upcoming_exams = Exam.objects.filter(
+            class_session__in=user_classes,
+            is_published=True,
+            scheduled_at__gte=timezone.now()
+        ).order_by('scheduled_at')[:5]
+
+    return render(request, 'dashboard.html', {
+        'enrollments': enrollments,
+        'upcoming_exams': upcoming_exams
+    })
