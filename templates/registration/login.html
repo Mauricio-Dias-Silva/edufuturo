@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Entrar - EduFuturo{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h3 class="text-center mb-4">Bem-vindo de volta! 👋</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <!-- Simple Loop for Form Fields with Bootstrap Styling -->
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}"
+                                class="form-control" {% if field.field.required %}required{% endif %}>
+                            {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Acessar Plataforma</button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <small>Ainda não tem conta? <a href="/register/">Criar conta grátis</a></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
