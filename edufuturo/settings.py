@@ -11,6 +11,16 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-edufuturo-dev-key-reb
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
 
+# CSRF Configuration for Cloud Run
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.run.app',  # Cloud Run URLs
+]
+
+# Cloud Run SSL Support
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
