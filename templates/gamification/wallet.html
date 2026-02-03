@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Minha Carteira JetCredits{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-12 text-center">
+            <h1 class="display-4 fw-bold text-primary">Minha Carteira <span class="text-secondary">JetCredits</span>
+            </h1>
+            <p class="lead">Ganhe créditos estudando e troque por benefícios reais.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Saldo e Card Principal -->
+        <div class="col-md-5">
+            <div class="card bg-dark text-white shadow-lg border-0 h-100 rounded-4"
+                style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                <div class="card-body p-5 d-flex flex-column justify-content-center align-items-center">
+                    <i class="bi bi-wallet2 display-1 mb-3 opacity-50"></i>
+                    <h5 class="text-uppercase letter-spacing-2 opacity-75">Seu Saldo Atual</h5>
+                    <h1 class="display-1 fw-bold mb-0">{{ wallet.balance|floatformat:0 }}</h1>
+                    <small class="fs-5 text-warning">JetCredits</small>
+
+                    <hr class="w-100 my-4 border-light opacity-25">
+
+                    <div class="text-center">
+                        <small class="d-block opacity-75 mb-1">Valor Estimado de Resgate</small>
+                        <h3 class="text-success fw-bold">R$ {{ conversion_rate_brl|floatformat:2 }}</h3>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 p-4">
+                    <button class="btn btn-warning w-100 btn-lg fw-bold shadow-sm">
+                        <i class="bi bi-arrow-repeat"></i> Trocar por Dinheiro
+                    </button>
+                    <small class="d-block text-center mt-2 opacity-50">*Disponível via JetPay</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Histórico e Badges -->
+        <div class="col-md-7">
+            <!-- Badges -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-trophy text-warning"></i> Minhas Conquistas</h5>
+                </div>
+                <div class="card-body">
+                    {% if badges %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for item in badges %}
+                        <div class="badge bg-light text-dark border p-2 d-flex align-items-center gap-2">
+                            <img src="{{ item.badge.image.url }}" alt="" width="30" height="30" class="rounded-circle">
+                            <span>{{ item.badge.name }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">Você ainda não tem conquistas. Continue estudando!</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Extrato -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history"></i> Histórico de Créditos</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for transaction in transactions %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ transaction.description }}</h6>
+                                <small class="text-muted">{{ transaction.created_at|date:"d/m/Y H:i" }}</small>
+                            </div>
+                            <span
+                                class="badge {% if transaction.transaction_type == 'CREDIT' %}bg-success{% else %}bg-danger{% endif %} rounded-pill fs-6">
+                                {% if transaction.transaction_type == 'CREDIT' %}+{% else %}-{% endif %} {{
+                                transaction.amount }}
+                            </span>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-4 text-muted">Nenhuma transação recente.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

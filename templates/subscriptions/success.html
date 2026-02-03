@@ -1,17 +1,98 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Assinatura Confirmada - EduFuturo{% endblock %}
+{% block title %}Assinatura Realizada - EduFuturo{% endblock %}
 
 {% block content %}
-<div class="container py-5 text-center">
-    <div class="card shadow-lg mx-auto" style="max-width: 600px;">
-        <div class="card-body p-5">
-            <i class="bi bi-check-circle-fill text-success display-1 mb-4"></i>
-            <h2 class="fw-bold mb-3">Parabéns! Assinatura Ativa.</h2>
-            <p class="lead text-muted">Você agora tem acesso ao plano <strong>{{ subscription.plan.name }}</strong>.</p>
-            <hr class="my-4">
-            <p>Seu acesso já está liberado. Bons estudos!</p>
-            <a href="/dashboard/" class="btn btn-primary btn-lg mt-3">Ir para Meu Painel</a>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body text-center p-5">
+                    <!-- Success Icon -->
+                    <div class="mb-4">
+                        <div class="d-inline-block bg-success bg-opacity-10 rounded-circle p-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor"
+                                class="bi bi-check-circle-fill text-success" viewBox="0 0 16 16">
+                                <path
+                                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="display-5 fw-bold text-success mb-3">🎉 Parabéns!</h1>
+                    <p class="lead text-muted mb-4">Sua assinatura foi realizada com sucesso!</p>
+
+                    <!-- Subscription Details -->
+                    <div class="bg-light rounded-3 p-4 mb-4">
+                        <h5 class="fw-bold mb-3">Detalhes da Assinatura</h5>
+                        <div class="row text-start">
+                            <div class="col-6">
+                                <p class="mb-2"><strong>Plano:</strong></p>
+                                <p class="text-muted">{{ subscription.plan.name }}</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-2"><strong>Valor:</strong></p>
+                                <p class="text-muted">R$ {{ subscription.plan.price }}</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-2"><strong>Status:</strong></p>
+                                <p>
+                                    {% if subscription.status == 'ACTIVE' %}
+                                    <span class="badge bg-success">Ativo</span>
+                                    {% elif subscription.status == 'PENDING' %}
+                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ subscription.get_status_display }}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-2"><strong>Início:</strong></p>
+                                <p class="text-muted">{{ subscription.start_date|date:"d/m/Y" }}</p>
+                            </div>
+                            {% if subscription.end_date %}
+                            <div class="col-12 mt-3">
+                                <p class="mb-2"><strong>Válido até:</strong></p>
+                                <p class="text-muted">{{ subscription.end_date|date:"d/m/Y às H:i" }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Benefits Section -->
+                    <div class="alert alert-info mb-4">
+                        <h6 class="fw-bold mb-2">✨ Você agora tem acesso a:</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li>📚 Todos os cursos da plataforma</li>
+                            <li>🎯 Exercícios e avaliações exclusivas</li>
+                            <li>🏆 Sistema completo de gamificação</li>
+                            <li>📊 Acompanhamento detalhado de progresso</li>
+                        </ul>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-3 d-md-flex justify-content-center">
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-success btn-lg px-5">
+                            <i class="bi bi-book me-2"></i>Explorar Cursos
+                        </a>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary btn-lg px-5">
+                            <i class="bi bi-speedometer2 me-2"></i>Ir ao Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="text-center mt-4">
+                <p class="text-muted">
+                    <small>
+                        Alguma dúvida? Entre em contato conosco pelo email
+                        <a href="mailto:suporte@edufuturo.com.br">suporte@edufuturo.com.br</a>
+                    </small>
+                </p>
+            </div>
         </div>
     </div>
 </div>

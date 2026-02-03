@@ -5,38 +5,127 @@
 {% block content %}
 <div class="container py-5">
     <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold">Planos de Assinatura</h1>
-        <p class="lead text-muted">Escolha o melhor plano para sua jornada de aprendizado</p>
+        <span class="badge bg-primary bg-gradient px-3 py-2 rounded-pill mb-3">Planos e Preços</span>
+        <h1 class="display-3 fw-bold mb-3"
+            style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Invista no Seu Futuro</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 600px;">
+            Escolha o plano ideal para desbloquear seu potencial. Acesso ilimitado, certificados reconhecidos e mentoria
+            exclusiva.
+        </p>
     </div>
 
-    <div class="row justify-content-center">
+    <div class="row justify-content-center align-items-center">
         {% for plan in plans %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow border-0 {% if plan.name == 'Pro' %}border-primary ring-2{% endif %}">
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-lg position-relative overflow-hidden"
+                style="border-radius: 20px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px);">
+
                 {% if plan.name == 'Pro' %}
-                <div class="card-header bg-primary text-white text-center py-3">
-                    <span class="fw-bold">Mais Popular</span>
+                <div class="position-absolute top-0 start-0 w-100 py-1 text-center text-white fw-bold"
+                    style="background: var(--primary-gradient);">
+                    <small>MAIS POPULAR</small>
                 </div>
                 {% endif %}
-                <div class="card-body p-5 text-center">
-                    <h3 class="fw-bold">{{ plan.name }}</h3>
-                    <div class="display-4 fw-bold my-4">R$ {{ plan.price }}</div>
-                    <p class="text-muted">{{ plan.description }}</p>
-                    <div class="d-grid mt-4">
-                        <a href="{% url 'subscriptions:subscribe' plan.slug %}"
-                            class="btn btn-lg {% if plan.name == 'Pro' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                            Assinar Agora
-                        </a>
+
+                <div class="card-body p-5 d-flex flex-column">
+                    <div class="text-center mb-4 {% if plan.name == 'Pro' %}mt-3{% endif %}">
+                        <h3 class="fw-bold mb-0">{{ plan.name }}</h3>
+                        <div class="d-flex justify-content-center align-items-center my-3">
+                            <span class="fs-4 text-muted me-1">R$</span>
+                            <span class="display-4 fw-bold text-dark">{{ plan.price|floatformat:0 }}</span>
+                            <span class="fs-6 text-muted ms-1">,{{ plan.price|floatformat:2|slice:"-2:" }}</span>
+                        </div>
+                        <p class="text-muted small mb-0">{{ plan.description }}</p>
                     </div>
-                    <ul class="list-unstyled mt-4 text-start">
-                        <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i> Acesso a todos os cursos</li>
-                        <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i> Certificados Incluídos</li>
-                        <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i> Suporte Prioritário</li>
+
+                    <ul class="list-unstyled mb-5 user-select-none">
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+                            <span>Acesso a <strong>todos os cursos</strong></span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+                            <span>Certificados <strong>ilimitados</strong></span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+                            <span>Acesso à comunidade exclusiva</span>
+                        </li>
+                        {% if plan.name == 'Pro' %}
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-star-fill text-warning me-3 fs-5"></i>
+                            <span><strong>Mentoria Mensal</strong> em Grupo</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-lightning-fill text-warning me-3 fs-5"></i>
+                            <span>Suporte Prioritário 24/7</span>
+                        </li>
+                        {% endif %}
                     </ul>
+
+                    <div class="mt-auto">
+                        <a href="{% url 'subscriptions:subscribe' plan.slug %}"
+                            class="btn btn-lg w-100 fw-bold py-3 rounded-pill {% if plan.name == 'Pro' %}btn-primary text-white shadow-lg{% else %}btn-outline-primary{% endif %}"
+                            style="{% if plan.name == 'Pro' %}background: var(--primary-gradient); border: none;{% endif %}">
+                            {% if plan.name == 'Pro' %}Quero ser Pro 🚀{% else %}Começar Agora{% endif %}
+                        </a>
+                        <div class="text-center mt-3">
+                            <small class="text-muted"><i class="bi bi-shield-lock"></i> Pagamento 100% Seguro</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+
+    <!-- FAQ Section -->
+    <div class="row justify-content-center mt-5 pt-5">
+        <div class="col-lg-8 text-center">
+            <h2 class="fw-bold mb-4">Dúvidas Frequentes</h2>
+            <div class="accordion accordion-flush" id="faqAccordion">
+                <div class="accordion-item bg-transparent">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed bg-transparent fw-bold" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#faq1">
+                            Posso cancelar a qualquer momento?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted text-start">
+                            Sim! Não temos fidelidade. Você pode cancelar sua assinatura a qualquer momento através do
+                            seu painel de controle.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item bg-transparent">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed bg-transparent fw-bold" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#faq2">
+                            Os certificados são reconhecidos?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted text-start">
+                            Sim, nossos certificados são válidos em todo o território nacional como cursos livres de
+                            capacitação profissional.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+    }
+</style>
 {% endblock %}

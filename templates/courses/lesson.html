@@ -78,32 +78,88 @@
 
                 <div class="d-flex justify-content-between mt-5">
                     <button class="btn btn-outline-secondary">Aula Anterior</button>
-                    <button class="btn btn-primary">Próxima Aula <i class="bi bi-arrow-right"></i></button>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="complete_lesson" value="true">
+                        {% if credits_earned %}
+                        <button type="button" class="btn btn-success" disabled>
+                            <i class="bi bi-check-circle"></i> +10 JetCredits Recebidos!
+                        </button>
+                        <a href="{% url 'gamification:my_wallet' %}" class="btn btn-outline-warning ms-2">Ver
+                            Carteira</a>
+                        {% else %}
+                        <button type="submit" class="btn btn-primary pulse-btn">
+                            Concluir Aula & Ganhar Créditos <i class="bi bi-coin"></i>
+                        </button>
+                        {% endif %}
+                    </form>
+
+                    <button class="btn btn-outline-primary">Próxima Aula <i class="bi bi-arrow-right"></i></button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+</div>
+
+<!-- 📀 COIN SHOWER CONTAINER -->
+<div id="coin-container"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none;">
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const creditBtn = document.querySelector('.btn-success[disabled]');
+        // Se o botão de créditos já estiver visível (ou seja, acabou de ganhar), dispara a chuva!
+        if (creditBtn && creditBtn.innerText.includes('JetCredits Recebidos')) {
+            spawnCoins();
+        }
+    });
+
+    function spawnCoins() {
+        const container = document.getElementById('coin-container');
+        container.style.display = 'block';
+
+        for (let i = 0; i < 50; i++) {
+            const coin = document.createElement('div');
+            coin.innerHTML = '🪙';
+            coin.style.position = 'absolute';
+            coin.style.left = Math.random() * 100 + 'vw';
+            coin.style.top = '-5vh';
+            coin.style.fontSize = (Math.random() * 2 + 1) + 'rem';
+            coin.style.animation = `fall ${Math.random() * 2 + 1}s linear forwards`;
+            container.appendChild(coin);
+
+            // Remove coin after animation
+            setTimeout(() => {
+                coin.remove();
+            }, 3000);
+        }
+    }
+</script>
 {% endblock %}
 
+
 {% block extra_css %}
-<style>
-    @keyframes pulse {
-        0% {
-            opacity: 1;
-        }
+@keyframes pulse {
+0% { opacity: 1; transform: scale(1); }
+50% { opacity: 0.8; transform: scale(1.05); }
+100% { opacity: 1; transform: scale(1); }
+}
 
-        50% {
-            opacity: 0.5;
-        }
+@keyframes fall {
+to { transform: translateY(110vh) rotate(360deg); }
+}
 
-        100% {
-            opacity: 1;
-        }
-    }
+.animate-pulse {
+animation: pulse 2s infinite;
+}
 
-    .animate-pulse {
-        animation: pulse 2s infinite;
-    }
+.pulse-btn {
+animation: pulse 1.5s infinite;
+box-shadow: 0 0 15px rgba(255, 193, 7, 0.6);
+}
 </style>
+
 {% endblock %}

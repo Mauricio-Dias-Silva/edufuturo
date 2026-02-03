@@ -37,4 +37,21 @@ def lesson_detail(request, slug, content_id):
         if match:
             youtube_id = match.group(1)
 
-    return render(request, 'courses/lesson.html', {'content': content, 'youtube_id': youtube_id})
+    # Lógica de Conclusão da Aula e Créditos
+    credits_earned = False
+    if request.method == 'POST' and 'complete_lesson' in request.POST:
+        from gamification.models import JetWallet
+        
+        # Pega ou cria a carteira
+        wallet, _ = JetWallet.objects.get_or_create(user=request.user)
+        
+        # Opcional: Verificar se já ganhou por este conteúdo para evitar farm de pontos
+        # Por enquanto, vamos deixar ganhar sempre para demonstração (ou user feedback)
+        wallet.credit(10, f"Aula concluída: {content.module.course.title} - {content.title}")
+        credits_earned = True
+
+    return render(request, 'courses/lesson.html', {
+        'content': content, 
+        'youtube_id': youtube_id,
+        'credits_earned': credits_earned
+    })
