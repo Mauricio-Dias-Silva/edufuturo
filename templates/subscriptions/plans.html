@@ -7,7 +7,7 @@
     <div class="text-center mb-5">
         <span class="badge bg-primary bg-gradient px-3 py-2 rounded-pill mb-3">Planos e Preços</span>
         <h1 class="display-3 fw-bold mb-3"
-            style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            style="background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
             Invista no Seu Futuro</h1>
         <p class="lead text-muted mx-auto" style="max-width: 600px;">
             Escolha o plano ideal para desbloquear seu potencial. Acesso ilimitado, certificados reconhecidos e mentoria
@@ -66,8 +66,7 @@
 
                     <div class="mt-auto">
                         <a href="{% url 'subscriptions:subscribe' plan.slug %}"
-                            class="btn btn-lg w-100 fw-bold py-3 rounded-pill {% if plan.name == 'Pro' %}btn-primary text-white shadow-lg{% else %}btn-outline-primary{% endif %}"
-                            style="{% if plan.name == 'Pro' %}background: var(--primary-gradient); border: none;{% endif %}">
+                            class="btn btn-lg w-100 fw-bold py-3 rounded-pill {% if plan.name == 'Pro' %}btn-primary text-white shadow-lg btn-pro-custom{% else %}btn-outline-primary{% endif %}">
                             {% if plan.name == 'Pro' %}Quero ser Pro 🚀{% else %}Começar Agora{% endif %}
                         </a>
                         <div class="text-center mt-3">
@@ -118,14 +117,19 @@
     </div>
 </div>
 
-<style>
-    .hover-lift {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
 
-    .hover-lift:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
-    }
+.hover-lift {
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+transform: translateY(-10px);
+box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+}
+
+.btn-pro-custom {
+background: var(--primary-gradient);
+border: none;
+}
 </style>
 {% endblock %}

@@ -1,49 +1,85 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 from .models import User
 
-# Extends standard UserCreationForm to support custom User model
+
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email')
+
 
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Default to student role
-            user.is_student = True 
+            user.is_student = True
             user.save()
             login(request, user)
-            return redirect('/')
+
+            # Create JetWallet on signup + welcome bonus
+            from gamification.models import JetWallet
+            wallet, created = JetWallet.objects.get_or_create(user=user)
+            if created:
+                wallet.credit(50, "Bônus de Boas-Vindas! 🎉")
+
+            return redirect('dashboard')
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
-def index(request):
-    # Import locally to avoid circular imports if any, though likely safe
-    from courses.models import Course
-    courses = Course.objects.all()[:3]
-    return render(request, 'index.html', {'courses': courses})
 
-from django.contrib.auth.decorators import login_required
+def index(request):
+    from courses.models import Course
+    from subscriptions.models import Plan
+    courses = Course.objects.all()[:6]
+    plans = Plan.objects.filter(is_active=True)[:3]
+    
+    # Stats for social proof
+    total_students = User.objects.filter(is_student=True).count()
+    total_courses = Course.objects.count()
+    
+    return render(request, 'index.html', {
+        'courses': courses,
+        'plans': plans,
+        'total_students': total_students,
+        'total_courses': total_courses,
+    })
+
 
 @login_required
 def dashboard(request):
-    # Fetch user enrollments (mock logic since we don't have full enrollment logic connected yet)
-    # properly we would do: enrollments = request.user.enrollments.all()
-    # For now, to demonstrate, empty or basic query
-    enrollments = [] 
-    if hasattr(request.user, 'enrollments'):
-        enrollments = request.user.enrollments.select_related('course').all()
-    
-    # Upcoming Exams Logic
+    from learning.models import Enrollment, Progress, Certificate
     from assessments.models import Exam
     from django.utils import timezone
-    
+    from courses.models import Content
+
+    # Enrollments
+    enrollments = request.user.enrollments.select_related('course').all()
+
+    # Real progress calculation
+    enrollment_data = []
+    for enrollment in enrollments:
+        total_contents = Content.objects.filter(module__course=enrollment.course).count()
+        completed_contents = Progress.objects.filter(
+            student=request.user,
+            content__module__course=enrollment.course
+        ).count()
+        progress = int((completed_contents / total_contents * 100) if total_contents > 0 else 0)
+        enrollment_data.append({
+            'enrollment': enrollment,
+            'progress': progress,
+            'completed': completed_contents,
+            'total': total_contents,
+        })
+
+    # Certificates
+    certificates = Certificate.objects.filter(student=request.user)
+
+    # Upcoming Exams
     upcoming_exams = []
     if hasattr(request.user, 'enrolled_classes'):
         user_classes = request.user.enrolled_classes.all()
@@ -55,5 +91,7 @@ def dashboard(request):
 
     return render(request, 'dashboard.html', {
         'enrollments': enrollments,
-        'upcoming_exams': upcoming_exams
+        'enrollment_data': enrollment_data,
+        'certificates': certificates,
+        'upcoming_exams': upcoming_exams,
     })

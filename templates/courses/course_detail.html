@@ -1,21 +1,71 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ course.title }} - EduFuturo{% endblock %}
 
 {% block content %}
-<div class="bg-primary text-white py-5">
-    <div class="container">
+<!-- Course Header -->
+<div class="position-relative bg-dark text-white py-5 overflow-hidden">
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-50 bg-gradient-primary"></div>
+    {% if course.cover %}
+    <div class="position-absolute top-0 start-0 w-100 h-100"
+        style="background: url('{{ course.cover.url }}') center/cover; filter: blur(8px); opacity: 0.3; z-index: 0;">
+    </div>
+    {% endif %}
+
+    <div class="container position-relative z-index-1 py-lg-4">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <h1 class="display-4 fw-bold">{{ course.title }}</h1>
-                <p class="lead mb-4">{{ course.overview }}</p>
-                <div class="d-flex align-items-center">
-                    <img src="https://ui-avatars.com/api/?name={{ course.instructor.username }}&background=random"
-                        class="rounded-circle me-2" width="40" height="40">
-                    <div>
-                        <span class="d-block fw-bold">Instrutor: {{
-                            course.instructor.get_full_name|default:course.instructor.username }}</span>
-                        <small class="text-white-50">Postado em {{ course.created|date:"d M, Y" }}</small>
+                <span class="badge bg-warning text-dark fw-bold mb-3">
+                    <i class="bi bi-star-fill me-1"></i> Curso Premium
+                </span>
+                <h1 class="display-4 fw-800 mb-3">{{ course.title }}</h1>
+                <p class="lead opacity-75 mb-4" style="max-width: 700px;">{{ course.overview }}</p>
+
+                <div class="d-flex align-items-center gap-4 text-sm fw-bold">
+                    <div class="d-flex align-items-center">
+                        <img src="https://ui-avatars.com/api/?name={{ course.instructor.username }}&background=fff&color=000"
+                            class="rounded-circle me-2" width="40">
+                        <span>{{ course.instructor.get_full_name|default:course.instructor.username }}</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-calendar3 me-2 opacity-75"></i>
+                        <span>Atualizado em {{ course.updated_at|date:"M Y"|default:"Recentemente" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mt-5 mt-lg-0">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-body p-4 text-center">
+                        {% if user.is_authenticated %}
+                        {% if is_enrolled %}
+                        <div class="mb-3">
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress }}%">
+                                </div>
+                            </div>
+                            <small class="text-muted mt-2 d-block">{{ progress }}% Concluído</small>
+                        </div>
+                        <a href="#modules" class="btn btn-success w-100 btn-lg rounded-pill fw-bold shadow-sm">
+                            <i class="bi bi-play-circle-fill me-2"></i>Continuar Curso
+                        </a>
+                        {% else %}
+                        <h2 class="fw-bold text-primary mb-3">Gratuito</h2>
+                        <form action="{% url 'courses:enroll' course.slug %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-gradient w-100 btn-lg rounded-pill fw-bold shadow">
+                                Matricule-se Agora
+                            </button>
+                        </form>
+                        <small class="text-muted d-block mt-3">Acesso vitalício + Certificado</small>
+                        {% endif %}
+                        {% else %}
+                        <h3 class="fw-bold mb-3">Comece Agora</h3>
+                        <a href="{% url 'login' %}?next={{ request.path }}"
+                            class="btn btn-outline-primary w-100 rounded-pill mb-2">Fazer Login</a>
+                        <a href="{% url 'register' %}" class="btn btn-primary w-100 rounded-pill">Criar Conta</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -23,95 +73,68 @@
     </div>
 </div>
 
-<div class="container py-5">
+<!-- Course Content -->
+<div class="container py-5" id="modules">
     <div class="row">
         <div class="col-lg-8">
-            <h3 class="mb-4">Conteúdo do Curso</h3>
-            <div class="accordion" id="accordionModules">
+            <h3 class="fw-bold mb-4">Conteúdo do Curso</h3>
+
+            <div class="accordion custom-accordion" id="courseAccordion">
                 {% for module in course.modules.all %}
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="heading{{ module.id }}">
-                        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#collapse{{ module.id }}">
-                            {{ module.order }}. {{ module.title }}
+                <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                    <h2 class="accordion-header">
+                        <button
+                            class="accordion-button {% if not forloop.first %}collapsed{% endif %} fw-bold bg-white py-3"
+                            type="button" data-bs-toggle="collapse" data-bs-target="#mod{{ module.id }}">
+                            <span class="me-3 opacity-50">#{{ module.order }}</span> {{ module.title }}
                         </button>
                     </h2>
-                    <div id="collapse{{ module.id }}"
+                    <div id="mod{{ module.id }}"
                         class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
-                        data-bs-parent="#accordionModules">
-                        <div class="accordion-body">
-                            {% if module.description %}
-                            <p class="text-muted small mb-3">{{ module.description }}</p>
-                            {% endif %}
+                        data-bs-parent="#courseAccordion">
+                        <div class="accordion-body bg-light p-0">
                             <ul class="list-group list-group-flush">
                                 {% for content in module.contents.all %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        {% if content.is_live %}
-                                        <span class="badge bg-danger me-2">AO VIVO</span>
-                                        {% elif content.video_url %}
-                                        <i class="bi bi-play-circle-fill text-danger me-2"></i>
-                                        {% else %}
-                                        <i class="bi bi-file-text-fill text-primary me-2"></i>
-                                        {% endif %}
-                                        {{ content.title }}
+                                <li
+                                    class="list-group-item bg-transparent border-bottom border-light py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <i
+                                            class="bi {% if content.video_url %}bi-play-circle-fill text-primary{% else %}bi-file-text-fill text-secondary{% endif %} fs-5 me-3"></i>
+                                        <span>{{ content.title }}</span>
                                     </div>
-                                    {% if user.is_authenticated %}
+
+                                    {% if user.is_authenticated and is_enrolled %}
                                     <a href="{% url 'courses:lesson' course.slug content.id %}"
-                                        class="btn btn-sm btn-outline-secondary">Acessar</a>
-                                    {% else %}
-                                    <i class="bi bi-lock-fill text-muted"></i>
+                                        class="btn btn-sm btn-light rounded-pill border">
+                                        Acessar
+                                    </a>
+                                    {% elif not is_enrolled %}
+                                    <i class="bi bi-lock-fill text-muted opacity-50"></i>
                                     {% endif %}
                                 </li>
                                 {% endfor %}
-                                {% if module.quiz %}
-                                <li
-                                    class="list-group-item list-group-item-warning d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i class="bi bi-puzzle-fill text-warning me-2"></i>
-                                        Quiz: {{ module.quiz.title }}
-                                    </div>
-                                </li>
-                                {% endif %}
                             </ul>
                         </div>
                     </div>
                 </div>
                 {% empty %}
-                <p class="text-muted">Ainda não há módulos neste curso.</p>
+                <div class="alert alert-light text-center">Nenhum módulo disponível ainda.</div>
                 {% endfor %}
             </div>
         </div>
 
+        <!-- Sidebar Info -->
         <div class="col-lg-4">
-            <div class="card shadow border-0 mb-4 position-sticky" style="top: 100px;">
-                <div class="card-body p-4">
-                    <h4 class="card-title fw-bold mb-3">Matricule-se Agora</h4>
-                    <p class="text-muted mb-4">Acesso vitalício a todo o conteúdo, suporte e certificação.</p>
-
-                    {% if user.is_authenticated %}
-                    <div class="d-grid">
-                        <form action="{% url 'courses:enroll' course.slug %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-success btn-lg w-100">Iniciar Curso</button>
-                        </form>
-                    </div>
-                    {% else %}
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary btn-lg">Fazer Login
-                            para Iniciar</a>
-                        <a href="{% url 'register' %}" class="btn btn-outline-secondary">Criar Conta</a>
-                    </div>
-                    {% endif %}
-
-                    <ul class="list-unstyled mt-4 text-muted small">
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Certificado de
-                            Conclusão</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Acesso 24/7</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Suporte com Instrutor
-                        </li>
-                    </ul>
-                </div>
+            <div class="card card-custom p-4 mb-4">
+                <h5 class="fw-bold mb-3">O que você vai aprender</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+                        <span>Fundamentos essenciais</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+                        <span>Projetos práticos</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+                        <span>Melhores práticas do mercado</span></li>
+                </ul>
             </div>
         </div>
     </div>

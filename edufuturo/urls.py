@@ -18,20 +18,15 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('users.urls')), # Auth Routes (Login, Register, Root)
+    path('', include('users.urls')),
     path('courses/', include('courses.urls')),
     path('subscriptions/', include('subscriptions.urls')),
-    path('assessments/', include('assessments.urls')), # New Assessments Module
-    path('assessments/', include('assessments.urls')), # New Assessments Module
-    path('gamification/', include('gamification.urls')), # JetCredits Loyalty System
+    path('assessments/', include('assessments.urls')),
+    path('gamification/', include('gamification.urls')),
     path('api-auth/', include('rest_framework.urls')),
-    
+
     # Swagger
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    
-    # Apps
-    # path('api/users/', include('users.urls')), # To be implemented
-    # path('api/courses/', include('courses.urls')),
 ]
 
 if settings.DEBUG:

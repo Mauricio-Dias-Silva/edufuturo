@@ -1,92 +1,111 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Minha Carteira JetCredits{% endblock %}
+{% block title %}Minha Carteira - EduFuturo{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row mb-4">
-        <div class="col-md-12 text-center">
-            <h1 class="display-4 fw-bold text-primary">Minha Carteira <span class="text-secondary">JetCredits</span>
-            </h1>
-            <p class="lead">Ganhe créditos estudando e troque por benefícios reais.</p>
-        </div>
+<div class="bg-dark text-white py-5" style="background: var(--gradient-dark);">
+    <div class="container text-center">
+        <h1 class="fw-800 display-4 mb-2">Minha Carteira</h1>
+        <p class="lead opacity-75">Gerencie seus JetCredits e troque por recompensas exclusivas.</p>
     </div>
+</div>
 
-    <div class="row g-4">
-        <!-- Saldo e Card Principal -->
-        <div class="col-md-5">
-            <div class="card bg-dark text-white shadow-lg border-0 h-100 rounded-4"
-                style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
-                <div class="card-body p-5 d-flex flex-column justify-content-center align-items-center">
-                    <i class="bi bi-wallet2 display-1 mb-3 opacity-50"></i>
-                    <h5 class="text-uppercase letter-spacing-2 opacity-75">Seu Saldo Atual</h5>
-                    <h1 class="display-1 fw-bold mb-0">{{ wallet.balance|floatformat:0 }}</h1>
-                    <small class="fs-5 text-warning">JetCredits</small>
+<div class="container py-5" style="margin-top: -3rem;">
+    <!-- Wallet Card -->
+    <div class="card card-custom border-0 shadow-lg mb-5 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="row g-0">
+                <!-- Balance Section -->
+                <div
+                    class="col-md-5 bg-gradient-primary text-white p-5 d-flex flex-column justify-content-center text-center">
+                    <small class="text-uppercase fw-bold opacity-75 mb-2">Saldo Atual</small>
+                    <h2 class="display-3 fw-bold mb-0">{{ wallet.balance|floatformat:0 }}</h2>
+                    <span class="fs-5 opacity-75">JetCredits (JC)</span>
 
-                    <hr class="w-100 my-4 border-light opacity-25">
-
-                    <div class="text-center">
-                        <small class="d-block opacity-75 mb-1">Valor Estimado de Resgate</small>
-                        <h3 class="text-success fw-bold">R$ {{ conversion_rate_brl|floatformat:2 }}</h3>
-                    </div>
-                </div>
-                <div class="card-footer bg-transparent border-0 p-4">
-                    <button class="btn btn-warning w-100 btn-lg fw-bold shadow-sm">
-                        <i class="bi bi-arrow-repeat"></i> Trocar por Dinheiro
-                    </button>
-                    <small class="d-block text-center mt-2 opacity-50">*Disponível via JetPay</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- Histórico e Badges -->
-        <div class="col-md-7">
-            <!-- Badges -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold"><i class="bi bi-trophy text-warning"></i> Minhas Conquistas</h5>
-                </div>
-                <div class="card-body">
-                    {% if badges %}
-                    <div class="d-flex flex-wrap gap-2">
-                        {% for item in badges %}
-                        <div class="badge bg-light text-dark border p-2 d-flex align-items-center gap-2">
-                            <img src="{{ item.badge.image.url }}" alt="" width="30" height="30" class="rounded-circle">
-                            <span>{{ item.badge.name }}</span>
+                    <div class="mt-4 pt-4 border-top border-white border-opacity-25">
+                        <small class="d-block mb-1 opacity-75">Nível Atual</small>
+                        <h4 class="fw-bold mb-2 text-warning"><i class="bi bi-trophy-fill me-2"></i>{{ wallet.level }}
+                        </h4>
+                        <!-- Level Progress -->
+                        <div class="progress bg-white bg-opacity-25 rounded-pill" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar"
+                                style="width: {{ level_progress }}%"></div>
                         </div>
-                        {% endfor %}
+                        <small class="mt-2 d-block opacity-75">{{ wallet.total_earned|floatformat:0 }} / {{
+                            next_level_at }} JC para o próximo nível</small>
                     </div>
-                    {% else %}
-                    <p class="text-muted text-center py-3">Você ainda não tem conquistas. Continue estudando!</p>
-                    {% endif %}
                 </div>
-            </div>
 
-            <!-- Extrato -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history"></i> Histórico de Créditos</h5>
-                </div>
-                <div class="card-body p-0">
+                <!-- Actions & History -->
+                <div class="col-md-7 p-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold mb-0">Últimas Transações</h4>
+                        <a href="{% url 'gamification:marketplace' %}"
+                            class="btn btn-outline-primary rounded-pill btn-sm">
+                            <i class="bi bi-shop me-1"></i> Ir para Loja
+                        </a>
+                    </div>
+
                     <div class="list-group list-group-flush">
-                        {% for transaction in transactions %}
-                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <div>
-                                <h6 class="mb-0 fw-bold">{{ transaction.description }}</h6>
-                                <small class="text-muted">{{ transaction.created_at|date:"d/m/Y H:i" }}</small>
+                        {% for t in transactions %}
+                        <div
+                            class="list-group-item px-0 border-light d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span
+                                    class="icon-square rounded-circle p-2 me-3 {% if t.transaction_type == 'CREDIT' %}bg-success bg-opacity-10 text-success{% else %}bg-danger bg-opacity-10 text-danger{% endif %}">
+                                    <i
+                                        class="bi {% if t.transaction_type == 'CREDIT' %}bi-arrow-down-left{% else %}bi-arrow-up-right{% endif %}"></i>
+                                </span>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ t.description }}</div>
+                                    <small class="text-muted">{{ t.created_at|date:"d M, H:i" }}</small>
+                                </div>
                             </div>
                             <span
-                                class="badge {% if transaction.transaction_type == 'CREDIT' %}bg-success{% else %}bg-danger{% endif %} rounded-pill fs-6">
-                                {% if transaction.transaction_type == 'CREDIT' %}+{% else %}-{% endif %} {{
-                                transaction.amount }}
+                                class="fw-bold {% if t.transaction_type == 'CREDIT' %}text-success{% else %}text-danger{% endif %}">
+                                {% if t.transaction_type == 'CREDIT' %}+{% else %}-{% endif %}{{ t.amount|floatformat:0
+                                }}
                             </span>
                         </div>
                         {% empty %}
-                        <div class="text-center py-4 text-muted">Nenhuma transação recente.</div>
+                        <p class="text-muted text-center py-4">Nenhuma transação ainda.</p>
                         {% endfor %}
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Marketplace Preview -->
+    <div class="text-center py-5">
+        <h3 class="fw-bold mb-4">Onde gastar seus créditos?</h3>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-3">
+                <div class="card card-custom p-4 text-center h-100">
+                    <i class="bi bi-patch-check-fill fs-1 text-primary mb-3"></i>
+                    <h5 class="fw-bold">Certificados</h5>
+                    <p class="text-muted small">Valide suas horas complementares.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-custom p-4 text-center h-100">
+                    <i class="bi bi-people-fill fs-1 text-success mb-3"></i>
+                    <h5 class="fw-bold">Mentorias</h5>
+                    <p class="text-muted small">Converse com experts da área.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-custom p-4 text-center h-100">
+                    <i class="bi bi-gift-fill fs-1 text-danger mb-3"></i>
+                    <h5 class="fw-bold">Merch</h5>
+                    <p class="text-muted small">Camisetas e canecas exclusivas.</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-5">
+            <a href="{% url 'gamification:marketplace' %}"
+                class="btn btn-primary btn-lg rounded-pill shadow px-5">Acessar Marketplace Completo</a>
         </div>
     </div>
 </div>
